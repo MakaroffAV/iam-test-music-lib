@@ -29,6 +29,7 @@ func main() {
 	)
 
 	h := api.HandlerFromMuxWithBaseURL(s, r, "/api")
+	log.Println("ready to accept connections .....")
 	if err := http.ListenAndServe(":8080", h); err != nil {
 		log.Fatalln(
 			err, "сервер неожиданно завершил работу",
