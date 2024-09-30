@@ -11,7 +11,7 @@ import (
 const (
 	sqlSongSearch = `
 	select
-	    t1.id,
+	    distinct t1.id,
 	    t1.album,
 	    t1.title,
 	    t1.artist,
