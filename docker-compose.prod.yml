@@ -7,7 +7,7 @@ services:
         ports:
             - "20010:5432"
         volumes:
-            - ./etc/data/pq:/var/lib/postgresql/data/
+            - /iam/test/music-lib:/var/lib/postgresql/data/
         networks:
             - prod_network
         healthcheck:
@@ -20,6 +20,24 @@ services:
             - POSTGRES_USER=${PDB_USER}
             - POSTGRES_PASSWORD=${PDB_PASS}
 
+    prod_app:
+        build:
+            context: .
+            dockerfile: dockerfile
+        ports:
+            - "20011:20000"
+        networks:
+            - prod_network
+        depends_on:
+            prod_app_init:
+                condition: service_completed_successfully
+        environment:
+            - PDB_NAME=${PDB_NAME}
+            - PDB_PORT=${PDB_PORT}
+            - PDB_HOST=${PDB_HOST}
+            - PDB_USER=${PDB_USER}
+            - PDB_PASS=${PDB_PASS}
+
     prod_app_init:
         image:
             makarov0aleksei/migrator
@@ -28,7 +46,7 @@ services:
         networks:
             - prod_network
         command: >
-            bash -c "/root/go/bin/goose -dir /db/migrations postgres 'postgresql://${MGR_USER}:${MGR_PASS}@${MGR_HOST}:${MGR_PORT}/${MGR_NAME}?sslmode=disable' up"
+            bash -c "/root/go/bin/goose -dir /db/migrations postgres 'postgresql://${PDB_USER}:${PDB_PASS}@${MGR_HOST}:${PDB_PORT}/${PDB_NAME}?sslmode=disable' up"
         depends_on:
             prod_pq:
                 condition: service_healthy
