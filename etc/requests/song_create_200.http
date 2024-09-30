@@ -1,0 +1,11 @@
+POST {{addr}}/api/song/create
+Content-Type: application/json
+
+{
+  "text": "End of passion play, crumbling away\nI'm your source of self-destruction\n....\n$$\nCome crawling faster\nObey your master\n",
+  "youtube": "https://youtu.be/E0ozmU9cJDg?si=WHpAYoRrC5EuAm6F",
+  "released": "1976-02-01",
+  "album": "Master of puppets",
+  "title": "Master of puppets",
+  "artist": "Metallica"
+}

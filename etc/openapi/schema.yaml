@@ -1,0 +1,365 @@
+openapi: 3.0.3
+info:
+    title: Swagger MusicLib
+    version: 0.0.1
+    description: Все запросы начинаются с префикса /api
+    contact:
+        email: mak_alexey@icloud.com
+paths:
+    /ping:
+        get:
+            description: Проверка доступности сервера
+            operationId: ping
+            responses:
+                "200":
+                    description: |
+                        Сервер доступен
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: ok
+                "500":
+                    description: Ошибка при выполнении запроса
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    /search:
+        get:
+            description: Получение списка всех песен
+            operationId: songSearch
+            parameters:
+                - name: limit
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/paginationLimit"
+                - name: offset
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/paginationOffset"
+
+                - name: text
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/text"
+                - name: title
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/song_name"
+                - name: album
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/album"
+                - name: artist
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/artist"
+                - name: youtube
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/youtube"
+                - name: released_from
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/released_from"
+                - name: released_to
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/released_to"
+            responses:
+                "200":
+                    description: |
+                        Список песен. Все фильтры не являются обязательными. Строгое совпадение применяется только для полей `released_to` и `released_from`.
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/song"
+                "500":
+                    description: Ошибка при выполнении запроса
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    /song/{songID}/verse:
+        get:
+            description: Получение текста песни
+            operationId: songVerses
+            parameters:
+                - name: songID
+                  in: path
+                  required: true
+                  schema:
+                      $ref: "#/components/schemas/songID"
+                - name: limit
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/paginationLimit"
+                - name: offset
+                  in: query
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/paginationOffset"
+            responses:
+                "200":
+                    description: Запрос выполнен
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/verse"
+                "404":
+                    description: Песня не найдена
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+                "500":
+                    description: Ошибка при выполнении запроса
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    /song/{songID}/delete:
+        delete:
+            description: Удаление песни
+            operationId: songDelete
+            parameters:
+                - name: songID
+                  in: path
+                  required: true
+                  schema:
+                      $ref: "#/components/schemas/songID"
+            responses:
+                "200":
+                    description: |
+                        Песня была успешно удалена
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: ok
+                "404":
+                    description: Песня не найдена
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+                "500":
+                    description: Ошибка при выполнении запроса
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    /song/create:
+        post:
+            description: Создание новой песни
+            operationId: songCreate
+            requestBody:
+                description: Данные новой песни
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                text:
+                                    $ref: "#/components/schemas/text"
+                                youtube:
+                                    $ref: "#/components/schemas/youtube"
+                                released:
+                                    $ref: "#/components/schemas/released"
+                                album:
+                                    $ref: "#/components/schemas/album"
+                                title:
+                                    $ref: "#/components/schemas/song_name"
+                                artist:
+                                    $ref: "#/components/schemas/artist"
+                            required:
+                                - text
+                                - youtube
+                                - released
+                                - album
+                                - title
+                                - artist
+            responses:
+                "200":
+                    description: песня успешно создана
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/song"
+                "500":
+                    description: Ошибка при выполнении запроса
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    /song/{songID}/update:
+        patch:
+            description: Обновление информации о песне
+            operationId: songUpdate
+            parameters:
+                - name: songID
+                  in: path
+                  required: true
+                  schema:
+                      $ref: "#/components/schemas/songID"
+            requestBody:
+                description: |
+                    Обновленные данные песни. Если какое-то поле пустое, оно останется неизменным.
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                youtube:
+                                    type: string
+                                    description: Ссылка на песню на YouTube
+                                    example: https://www.youtube.com/watch?v=E0ozmU9cJDg
+                                released:
+                                    type: string
+                                    format: date
+                                    description: Дата выпуска песни (в формате ISO 8601)
+                                    example: 1976-02-01
+                                album:
+                                    type: string
+                                    description: Имя альбома, в который входит песня
+                                title:
+                                    type: string
+                                    description: Наименование песни
+                                artist:
+                                    type: string
+                                    description: Имя исполнителя
+            responses:
+                "200":
+                    description: песня успешно обновлена
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/song"
+                "404":
+                    description: Песня не найдена
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+                "500":
+                    description: Ошибка при выполнении запроса
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+components:
+    schemas:
+        youtube:
+            type: string
+            description: Ссылка на песню на YouTube
+            example: https://youtu.be/E0ozmU9cJDg?si=WHpAYoRrC5EuAm6F
+        text:
+            type: string
+            description: |
+                Текст песни. Чтобы разделять куплеты,
+                используется последовательность `$$`. 
+                
+                Если она отсутствует, считается, что весь текст — это один куплет.
+            example: |
+                End of passion play, crumbling away
+                I'm your source of self-destruction
+                ....
+                $$
+                Come crawling faster
+                Obey your master
+        album:
+            type: string
+            description: Наименование альбома
+            example: Master of puppets
+        artist:
+            type: string
+            description: Имя исполнителя
+            example: Metallica
+        song_name:
+            type: string
+            description: Наименование песни
+            example: Master of puppets
+        released:
+            type: string
+            format: date
+            description: Дата выпуска песни (в формате ISO 8601)
+            example: 1976-02-01
+        released_to:
+            type: string
+            format: date
+            description: Дата выпуска песни (до). Ожидается формат ISO 8601.
+            example: 1976-01-01
+        released_from:
+            type: string
+            format: date
+            description: Дата выпуска песни (от). Ожидается формат ISO 8601.
+            example: 1975-01-01
+        songID:
+            type: string
+            description: Уникальный идентификатор песни
+            example: e232405f-53d2-470a-b91c-39df9eb1753b
+        errorResponse:
+            type: object
+            description: Ошибка выполнения запроса
+            properties:
+                reason:
+                    type: string
+                    description: Описание ошибки
+                    example: <Описание ошибки>
+        song:
+            type: object
+            description: Описание песни
+            properties:
+                id:
+                    $ref: "#/components/schemas/songID"
+                youtube:
+                    $ref: "#/components/schemas/youtube"
+                album:
+                    $ref: "#/components/schemas/album"
+                artist:
+                    $ref: "#/components/schemas/artist"
+                title:
+                    $ref: "#/components/schemas/song_name"
+                released:
+                    $ref: "#/components/schemas/released"
+        paginationLimit:
+            type: integer
+            description: Лимит на количество записей в ответе
+            example: 10
+        paginationOffset:
+            type: integer
+            description: Смещение для пагинации
+            example: 0
+        verse:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: Уникальный идентификатор куплета песни
+                    example: e232405f-53d2-470a-b91c-39df9eb1753b
+                text:
+                    type: string
+                    description: Куплет песни
+                songID:
+                    $ref: "#/components/schemas/songID"
+                orderNum:
+                    type: number
+                    description: Порядковый номер куплета песни

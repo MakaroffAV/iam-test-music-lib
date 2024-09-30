@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+    prod_pq:
+        image:
+            postgres
+        ports:
+            - "20010:5432"
+        volumes:
+            - ./etc/data/pq:/var/lib/postgresql/data/
+        networks:
+            - prod_network
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -d ${PDB_NAME} -U ${PDB_USER}"]
+            retries: 5
+            timeout: 5s
+            interval: 10s
+        environment:
+            - POSTGRES_DB=${PDB_NAME}
+            - POSTGRES_USER=${PDB_USER}
+            - POSTGRES_PASSWORD=${PDB_PASS}
+
+    prod_app_init:
+        image:
+            makarov0aleksei/migrator
+        volumes:
+            - ./migrations:/db/migrations
+        networks:
+            - prod_network
+        command: >
+            bash -c "/root/go/bin/goose -dir /db/migrations postgres 'postgresql://${MGR_USER}:${MGR_PASS}@${MGR_HOST}:${MGR_PORT}/${MGR_NAME}?sslmode=disable' up"
+        depends_on:
+            prod_pq:
+                condition: service_healthy
+
+networks:
+    prod_network:
+        driver: bridge

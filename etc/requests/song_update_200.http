@@ -1,0 +1,6 @@
+PATCH {{addr}}/api/song/8eb2af3e-8e28-4ea8-9c20-98d73b49132f/update
+Content-Type: application/json
+
+{
+  "released": "1986-03-03"
+}
