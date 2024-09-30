@@ -46,7 +46,7 @@ services:
         networks:
             - prod_network
         command: >
-            bash -c "/root/go/bin/goose -dir /db/migrations postgres 'postgresql://${PDB_USER}:${PDB_PASS}@${MGR_HOST}:${PDB_PORT}/${PDB_NAME}?sslmode=disable' up"
+            bash -c "/root/go/bin/goose -dir /db/migrations postgres 'postgresql://${PDB_USER}:${PDB_PASS}@${PDB_HOST}:${PDB_PORT}/${PDB_NAME}?sslmode=disable' up"
         depends_on:
             prod_pq:
                 condition: service_healthy
