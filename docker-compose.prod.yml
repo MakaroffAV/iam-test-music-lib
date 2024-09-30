@@ -25,7 +25,7 @@ services:
             context: .
             dockerfile: dockerfile
         ports:
-            - "20011:20000"
+            - "20011:8080"
         networks:
             - prod_network
         depends_on:
